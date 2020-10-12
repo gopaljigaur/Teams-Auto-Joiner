@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.utils import ChromeType
+from msedge.selenium_tools import Edge, EdgeOptions
 
 browser: webdriver.Chrome = None
 config = None
@@ -162,7 +163,7 @@ class Team:
 
 def load_config():
     global config
-    with open('config.json') as json_data_file:
+    with open('C:/auto_joiner/config.json') as json_data_file:
         config = json.load(json_data_file)
 
 
@@ -269,12 +270,17 @@ def hangup():
 def main():
     global browser, config
 
+    #driver = Edge(options)
     load_config()
 
-    chrome_options = webdriver.ChromeOptions()
+    chrome_options = EdgeOptions()
+    chrome_options.use_chromium = True
+    
+    #chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--ignore-ssl-errors')
     chrome_options.add_argument("--use-fake-ui-for-media-stream")
+    chrome_options.add_argument("--disable-extensions")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
     if 'headless' in config and config['headless']:
@@ -284,14 +290,9 @@ def main():
     if 'mute_audio' in config and config['mute_audio']:
         chrome_options.add_argument("--mute-audio")
 
-    chrome_type = ChromeType.GOOGLE
-    if 'chrome_type' in config:
-        if config['chrome_type'] == "chromium":
-            chrome_type = ChromeType.CHROMIUM
-        elif config['chrome_type'] == "msedge":
-            chrome_type = ChromeType.MSEDGE     
-
-    browser = webdriver.Chrome(ChromeDriverManager(chrome_type=chrome_type).install(), options=chrome_options)
+    chrome_type = ChromeType.MSEDGE
+    browser = Edge(options=chrome_options)
+    #browser = webdriver.Chrome(ChromeDriverManager(chrome_type=chrome_type).install(), options=chrome_options)
 
     browser.get("https://teams.microsoft.com")
 
